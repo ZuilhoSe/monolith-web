@@ -104,6 +104,10 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .empty-tab a:hover{text-decoration:underline}
 .empty-tab kbd{font-size:.72em; opacity:.8}
 
+/* Graph view */
+.graph-host{flex:1; position:relative; min-height:0; overflow:hidden; background:var(--bg)}
+.graph-canvas{position:absolute; inset:0; display:block; cursor:grab}
+
 .scroll{flex:1; overflow:auto; min-height:0}
 .view{max-width:720px; margin:0 auto; padding:34px 40px 10px}
 .editor{flex:1; width:100%; background:var(--bg); color:var(--txt); border:0; outline:none; resize:none; padding:34px calc(50% - 360px) 80px; font-family:var(--mono); font-size:14px; line-height:1.7; tab-size:4}

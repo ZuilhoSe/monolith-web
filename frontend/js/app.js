@@ -4,12 +4,13 @@
 import { ServerAdapter, LocalAdapter } from "./vault.js";
 import { mountInto } from "./render.js";
 import { buildNoteIndex, resolveNote, Indexer } from "./search.js";
+import { renderGraph } from "./graph.js";
 
 const el = {};
 ["app", "ribbon", "landing", "open-folder", "unsupported", "vault-name", "mode-badge",
  "filter", "tree", "search-input", "search-results", "index-state",
- "pane-files", "pane-search", "pane-graph", "view", "scroll", "backlinks", "editor",
- "tabs", "tab-new", "btn-edit", "btn-save", "btn-cancel", "save-state",
+ "pane-files", "pane-search", "view", "scroll", "graph-host", "backlinks", "editor",
+ "rib-graph", "tabs", "tab-new", "btn-edit", "btn-save", "btn-cancel", "save-state",
  "statusbar", "sb-backlinks", "sb-count", "rib-about", "sidebar", "toast",
  "vault-switcher", "vs-name",
  "about", "about-mode", "about-vault", "about-open", "about-note", "about-close",
@@ -124,6 +125,7 @@ async function loadIntoView(path) {
 
 /* ---------- abas ---------- */
 function tabName(t) {
+  if (t.graph) return "Grafo";
   if (!t.path) return "Nova aba";
   return (S.index && S.index.flat.find((f) => f.path === t.path)?.name) || t.path.replace(/\.md$/i, "");
 }
@@ -146,7 +148,7 @@ function activateTab(i) {
   if (S.editing && !confirmDiscard()) return;
   S.active = i; renderTabs();
   const t = S.tabs[i];
-  if (t.path) loadIntoView(t.path); else showEmptyTab();
+  if (t.graph) showGraph(); else if (t.path) loadIntoView(t.path); else showEmptyTab();
 }
 function newTab() {
   if (S.editing && !confirmDiscard()) return;
@@ -160,11 +162,42 @@ function closeTab(i) {
   else if (S.active >= S.tabs.length) S.active = S.tabs.length - 1;
   renderTabs();
   const t = S.tabs[S.active];
-  if (t.path) loadIntoView(t.path); else showEmptyTab();
+  if (t.graph) showGraph(); else if (t.path) loadIntoView(t.path); else showEmptyTab();
+}
+
+/* ---------- graph view ---------- */
+function openGraphTab() {
+  if (S.editing && !confirmDiscard()) return;
+  if (S.active >= 0 && !S.tabs[S.active].path && !S.tabs[S.active].graph) S.tabs[S.active] = { graph: true };
+  else { S.tabs.push({ graph: true }); S.active = S.tabs.length - 1; }
+  renderTabs(); showGraph();
+}
+function showGraph() {
+  S.current = null; S.editing = false; highlight(null);
+  el.scroll.hidden = true; el.editor.hidden = true; el["graph-host"].hidden = false;
+  el["btn-edit"].hidden = el["btn-save"].hidden = el["btn-cancel"].hidden = true;
+  el["save-state"].textContent = "";
+  const idx = new Map(), nodes = [], edges = [];
+  S.index.flat.forEach((f, i) => {
+    idx.set(f.path, i);
+    nodes.push({ id: f.path, name: f.name, x: (Math.random() - 0.5) * 300, y: (Math.random() - 0.5) * 300, vx: 0, vy: 0, deg: 0 });
+  });
+  if (S.indexer) {
+    for (const [path, d] of S.indexer.docs) {
+      const a = idx.get(path); if (a == null) continue;
+      for (const target of d.links) {
+        const b = idx.get(target); if (b == null || b === a) continue;
+        edges.push([a, b]); nodes[a].deg++; nodes[b].deg++;
+      }
+    }
+  }
+  el["sb-count"].textContent = `${nodes.length} notas · ${edges.length} links`;
+  el["sb-backlinks"].textContent = S.indexer && S.indexer.ready ? "" : "indexando…";
+  renderGraph(el["graph-host"], nodes, edges, (path) => openNote(path));
 }
 function showEmptyTab() {
   S.current = null; S.editing = false;
-  el.scroll.hidden = false; el.editor.hidden = true; el.backlinks.hidden = true;
+  el.scroll.hidden = false; el["graph-host"].hidden = true; el.editor.hidden = true; el.backlinks.hidden = true;
   el["btn-edit"].hidden = el["btn-save"].hidden = el["btn-cancel"].hidden = true;
   el["save-state"].textContent = "";
   el["sb-backlinks"].textContent = ""; el["sb-count"].textContent = "";
@@ -182,7 +215,7 @@ function showEmptyTab() {
 }
 
 async function renderView() {
-  el.editor.hidden = true; el.scroll.hidden = false;
+  el.editor.hidden = true; el["graph-host"].hidden = true; el.scroll.hidden = false;
   await mountInto(el.view, S.raw, ctx());
   el["btn-edit"].hidden = S.readOnly;
   el["btn-save"].hidden = el["btn-cancel"].hidden = true;
@@ -308,7 +341,6 @@ function switchPane(pane) {
   el.ribbon.querySelectorAll(".rib[data-pane]").forEach((r) => r.classList.toggle("active", r.dataset.pane === pane));
   el["pane-files"].hidden = pane !== "files";
   el["pane-search"].hidden = pane !== "search";
-  el["pane-graph"].hidden = pane !== "graph";
   if (pane === "search") el["search-input"].focus();
 }
 
@@ -372,6 +404,7 @@ function wireUI() {
   document.querySelectorAll(".file-toolbar .ft").forEach((b) => b.addEventListener("click", () => handleFt(b)));
   el["vault-switcher"].addEventListener("click", openAbout);
   el["rib-about"].addEventListener("click", openAbout);
+  el["rib-graph"].addEventListener("click", openGraphTab);
   el["tab-new"].addEventListener("click", newTab);
   el["vault-name"].addEventListener("click", openAbout);
   el["about-close"].addEventListener("click", closeAbout);

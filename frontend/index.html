@@ -24,7 +24,7 @@
       <button class="rib" data-soon="Favoritos" title="Favoritos (em breve)">
         <svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       </button>
-      <button class="rib" data-pane="graph" title="Grafo (em breve)">
+      <button class="rib" id="rib-graph" title="Grafo">
         <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
       </button>
       <button class="rib" data-soon="Canvas" title="Canvas (em breve)">
@@ -80,10 +80,6 @@
         <div id="search-results" class="results"></div>
       </div>
 
-      <div class="pane" id="pane-graph" hidden>
-        <div class="soon">🕸️ Graph view<br><span>chega na v0.3</span></div>
-      </div>
-
       <!-- Seletor de vault (rodapé) -->
       <button class="vault-switcher" id="vault-switcher" title="Trocar de vault">
         <span class="vs-icon">🪨</span>
@@ -112,6 +108,7 @@
         <section id="view" class="view markdown"></section>
         <section id="backlinks" class="backlinks" hidden></section>
       </div>
+      <div id="graph-host" class="graph-host" hidden></div>
       <textarea id="editor" class="editor" spellcheck="false" hidden></textarea>
       <footer id="statusbar">
         <span id="sb-backlinks"></span>
