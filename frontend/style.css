@@ -1,0 +1,234 @@
+:root{
+  --bg:#1e1e1e; --bg-alt:#1a1a1a; --bg-sec:#242424; --bg-mod:#2d2d2d;
+  --line:#383838; --line-soft:#303030;
+  --txt:#dcddde; --mut:#9a9a9a; --faint:#6b6b6b;
+  --acc:#a78bfa; --acc-strong:#7c5cff;
+  --hover:rgba(255,255,255,.055); --active:rgba(255,255,255,.10);
+  --ok:#4ec9b0; --warn:#e2b340; --err:#f48771;
+  --font:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;
+  --mono:"SFMono-Regular",ui-monospace,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{margin:0; background:var(--bg); color:var(--txt); font-family:var(--font); font-size:15px; -webkit-font-smoothing:antialiased}
+kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:.82em; font-family:var(--mono)}
+
+/* Scrollbars finas, estilo Obsidian */
+*{scrollbar-width:thin; scrollbar-color:#3d3d3d transparent}
+::-webkit-scrollbar{width:12px; height:12px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#3a3a3a; border-radius:10px; border:3px solid transparent; background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#505050; background-clip:padding-box}
+::-webkit-scrollbar-corner{background:transparent}
+
+#app{display:grid; grid-template-columns:48px 260px 1fr; grid-template-rows:minmax(0,1fr); height:100vh; overflow:hidden}
+
+/* Ribbon */
+#ribbon{background:var(--bg-alt); display:flex; flex-direction:column; align-items:center; padding:8px 0; gap:2px; border-right:1px solid var(--line-soft)}
+.rib{width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:0; border-radius:7px; color:var(--mut); cursor:pointer}
+.rib:hover{background:var(--hover); color:var(--txt)}
+.rib.active{color:var(--acc); background:var(--active)}
+.rib svg{width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.rib-spacer{flex:1}
+
+/* Sidebar */
+#sidebar{background:var(--bg-sec); border-right:1px solid var(--line-soft); display:flex; flex-direction:column; min-height:0; overflow:hidden}
+.side-head{display:flex; align-items:center; gap:8px; padding:12px 14px 10px}
+.vault-name{font-weight:600; font-size:13px; color:var(--txt); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mode-badge{flex:none; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; padding:1.5px 6px; border-radius:20px; border:1px solid var(--line); color:var(--faint)}
+.mode-badge.server{color:var(--ok); border-color:#2d5b4f}
+.mode-badge.local{color:var(--acc); border-color:#443a66}
+.pane{display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; padding:0 8px 8px}
+.inp{width:100%; background:var(--bg-mod); border:1px solid var(--line); color:var(--txt); border-radius:7px; padding:6px 9px; font-size:13px; outline:none; margin-bottom:6px}
+.inp:focus{border-color:var(--acc-strong)}
+.soon{color:var(--faint); font-size:13px; padding:20px 8px; text-align:center}
+
+/* Árvore de arquivos */
+.tree{overflow:auto; flex:1; min-height:0; padding-bottom:20px; font-size:13.5px}
+.tree ul{list-style:none; margin:0; padding-left:13px}
+.tree > ul{padding-left:2px}
+.tree .node{display:flex; align-items:center; gap:4px; padding:3px 6px; border-radius:6px; cursor:pointer; color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; user-select:none}
+.tree .node:hover{background:var(--hover); color:var(--txt)}
+.tree .node.active{background:var(--active); color:var(--txt)}
+.tree .node .ico{flex:none; width:14px; text-align:center; font-size:10px; color:var(--faint); transition:transform .12s}
+.tree .dir > .node{font-weight:500; color:var(--mut)}
+.tree .dir.collapsed > .node .ico{transform:rotate(-90deg)}
+.tree .dir.collapsed > ul{display:none}
+.tree .file-ico{flex:none; width:14px; opacity:.5; font-size:11px}
+
+/* Resultados (busca / switcher) */
+.results{overflow:auto; flex:1; min-height:0}
+.index-state{font-size:11px; color:var(--faint); padding:2px 4px 6px}
+.result{padding:7px 9px; border-radius:7px; cursor:pointer}
+.result:hover{background:var(--hover)}
+.r-name{font-weight:600; font-size:13px}
+.r-snip{color:var(--mut); font-size:12px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.hint{color:var(--faint); font-size:12px; padding:8px 4px}
+
+/* Main */
+#main{position:relative; display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--bg)}
+#view-header{display:flex; align-items:center; gap:10px; height:42px; padding:0 14px; border-bottom:1px solid var(--line-soft); flex:none}
+.vh-title{color:var(--mut); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.vh-actions{margin-left:auto; display:flex; align-items:center; gap:6px}
+.icon-btn{width:30px; height:30px; display:flex; align-items:center; justify-content:center; background:none; border:0; border-radius:6px; color:var(--mut); cursor:pointer}
+.icon-btn:hover{background:var(--hover); color:var(--txt)}
+.icon-btn svg{width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.btn{background:var(--bg-mod); color:var(--txt); border:1px solid var(--line); border-radius:7px; padding:7px 13px; font-size:13px; cursor:pointer}
+.btn:hover{background:#363636}
+.btn.sm{padding:5px 11px; font-size:12.5px}
+.btn.primary{background:var(--acc-strong); border-color:var(--acc-strong); color:#fff}
+.btn.primary:hover{background:#6a4ae8}
+.save-state{font-size:12px; color:var(--faint)}
+.save-state.ok{color:var(--ok)} .save-state.err{color:var(--err)}
+
+/* Barra de abas (estilo Obsidian) */
+#tabbar{display:flex; align-items:stretch; height:40px; flex:none; border-bottom:1px solid var(--line-soft); background:var(--bg-sec)}
+.tabs-row{display:flex; align-items:stretch; overflow-x:auto; overflow-y:hidden; flex:1; min-width:0; scrollbar-width:none}
+.tabs-row::-webkit-scrollbar{display:none}
+.tab-item{display:flex; align-items:center; gap:8px; padding:0 8px 0 14px; max-width:200px; min-width:92px; border-right:1px solid var(--line-soft); color:var(--mut); cursor:pointer; font-size:13px; background:var(--bg-alt)}
+.tab-item.active{background:var(--bg); color:var(--txt)}
+.tab-item:hover{color:var(--txt)}
+.tab-label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1}
+.tab-close{opacity:0; font-size:17px; line-height:1; width:18px; height:18px; display:flex; align-items:center; justify-content:center; border-radius:4px; flex:none}
+.tab-item:hover .tab-close,.tab-item.active .tab-close{opacity:.55}
+.tab-close:hover{opacity:1 !important; background:var(--hover)}
+.tab-new{flex:none; width:34px; display:flex; align-items:center; justify-content:center; background:var(--bg-sec); border:0; border-right:1px solid var(--line-soft); color:var(--mut); cursor:pointer}
+.tab-new:hover{background:var(--hover); color:var(--txt)}
+.tab-new svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+#tabbar .vh-actions{padding:0 12px; align-items:center; margin-left:0}
+
+/* Aba vazia (ações estilo Obsidian) */
+.empty-tab{display:flex; flex-direction:column; align-items:center; gap:16px; padding-top:22vh}
+.empty-tab a{color:var(--acc); cursor:pointer; font-size:16px; display:flex; align-items:center; gap:10px}
+.empty-tab a:hover{text-decoration:underline}
+.empty-tab kbd{font-size:.72em; opacity:.8}
+
+.scroll{flex:1; overflow:auto; min-height:0}
+.view{max-width:720px; margin:0 auto; padding:34px 40px 10px}
+.editor{flex:1; width:100%; background:var(--bg); color:var(--txt); border:0; outline:none; resize:none; padding:34px calc(50% - 360px) 80px; font-family:var(--mono); font-size:14px; line-height:1.7; tab-size:4}
+
+.welcome{position:absolute; inset:42px 0 26px 0; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--faint); pointer-events:none}
+.welcome p{line-height:1.7}
+.welcome-logo{font-size:40px; margin-bottom:10px}
+
+/* Status bar */
+#statusbar{flex:none; height:26px; display:flex; align-items:center; justify-content:flex-end; gap:16px; padding:0 16px; border-top:1px solid var(--line-soft); background:var(--bg-sec); color:var(--faint); font-size:12px}
+
+/* Backlinks */
+.backlinks{max-width:720px; margin:10px auto 40px; padding:14px 40px 0; border-top:1px solid var(--line-soft)}
+.bl-title{font-size:12px; font-weight:600; color:var(--mut); margin-bottom:10px}
+.bl-list{display:flex; flex-direction:column; gap:2px}
+.bl-item{color:var(--acc); font-size:14px; cursor:pointer; text-decoration:none; padding:4px 8px; border-radius:6px; display:inline-block}
+.bl-item:hover{background:var(--hover)}
+
+/* Markdown (reading view estilo Obsidian) */
+.markdown{line-height:1.6; font-size:16px}
+.markdown > :first-child{margin-top:0}
+.markdown h1,.markdown h2,.markdown h3,.markdown h4{line-height:1.3; margin:1.5em 0 .6em; font-weight:700; color:#e6e7e8}
+.markdown h1{font-size:1.85em} .markdown h2{font-size:1.45em} .markdown h3{font-size:1.2em} .markdown h4{font-size:1.05em}
+.markdown p{margin:.8em 0}
+.markdown a{color:var(--acc); text-decoration:none}
+.markdown a:hover{text-decoration:underline}
+.markdown a.wikilink.missing{color:var(--err); opacity:.75}
+.markdown a.embed-note{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg-sec)}
+.markdown code{background:var(--bg-mod); padding:.12em .4em; border-radius:4px; font-size:.87em; font-family:var(--mono)}
+.markdown pre{background:var(--bg-alt); border:1px solid var(--line-soft); padding:14px 16px; border-radius:8px; overflow:auto}
+.markdown pre code{background:none; padding:0}
+.markdown blockquote{border-left:3px solid var(--line); margin:1em 0; padding:.2em 1em; color:var(--mut)}
+.markdown table{border-collapse:collapse; margin:1em 0; display:block; overflow:auto}
+.markdown th,.markdown td{border:1px solid var(--line); padding:6px 12px}
+.markdown th{background:var(--bg-sec)}
+.markdown img{max-width:100%; border-radius:6px}
+.markdown hr{border:0; border-top:1px solid var(--line); margin:1.8em 0}
+.markdown ul,.markdown ol{padding-left:1.5em; margin:.6em 0}
+.markdown li{margin:.2em 0}
+
+/* Tarefas */
+.markdown li:has(> input[type="checkbox"]){list-style:none; margin-left:-1.35em}
+.markdown input[type="checkbox"]{width:16px; height:16px; margin-right:8px; vertical-align:-3px; cursor:pointer; accent-color:var(--acc-strong)}
+
+/* Callouts */
+.callout{border-radius:8px; margin:1em 0; background:var(--bg-sec); border:1px solid var(--line-soft); border-left:3px solid var(--acc-strong); overflow:hidden}
+.callout-title{display:flex; align-items:center; gap:8px; padding:9px 14px; font-weight:600; font-size:.96em; background:rgba(124,92,255,.07)}
+.callout-body{padding:4px 14px 10px}
+.callout-body > :first-child{margin-top:.3em}
+.callout-info,.callout-note{border-left-color:#4aa3ff} .callout-info .callout-title,.callout-note .callout-title{background:rgba(74,163,255,.08)}
+.callout-tip,.callout-success{border-left-color:var(--ok)} .callout-tip .callout-title,.callout-success .callout-title{background:rgba(78,201,176,.08)}
+.callout-warning,.callout-caution{border-left-color:var(--warn)} .callout-warning .callout-title,.callout-caution .callout-title{background:rgba(226,179,64,.08)}
+.callout-danger,.callout-bug,.callout-failure{border-left-color:var(--err)} .callout-danger .callout-title,.callout-bug .callout-title,.callout-failure .callout-title{background:rgba(244,135,113,.08)}
+
+/* Mermaid / KaTeX / erros */
+.mermaid{display:flex; justify-content:center; margin:1.2em 0}
+.mermaid svg{max-width:100%}
+.markdown .katex-display{overflow:auto hidden; padding:2px 0}
+.katex-error,.err{color:var(--err)}
+.img-missing{color:var(--faint); font-style:italic}
+
+/* Landing */
+.landing{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:20px}
+.landing-card{max-width:430px; text-align:center}
+.landing-card h1{font-weight:700; margin:6px 0 10px}
+.landing-card p{color:var(--mut); line-height:1.6}
+.btn.big{font-size:15px; padding:13px 24px; margin-top:16px}
+.unsupported{color:var(--warn); font-size:13px; margin-top:16px}
+
+/* Quick switcher */
+.switcher{position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; justify-content:center; align-items:flex-start; padding-top:13vh; z-index:50}
+.switcher-box{width:min(580px,92vw); background:var(--bg-sec); border:1px solid var(--line); border-radius:10px; overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,.55)}
+#switcher-input{width:100%; background:none; border:0; border-bottom:1px solid var(--line-soft); color:var(--txt); padding:14px 16px; font-size:16px; outline:none}
+.switcher-box .results{max-height:52vh; padding:6px}
+.sw-item{display:flex; align-items:baseline; gap:10px; padding:8px 11px; border-radius:7px; cursor:pointer}
+.sw-item.sel,.sw-item:hover{background:var(--active)}
+.sw-name{font-weight:600; font-size:14px}
+.sw-path{color:var(--faint); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* Nome do vault clicável (abre Sobre / trocar vault) */
+.vault-name{cursor:pointer}
+.vault-name:hover{color:#fff}
+
+/* Modal genérico (Sobre) */
+.modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:60; padding:20px}
+.modal-box{width:min(420px,92vw); background:var(--bg-sec); border:1px solid var(--line); border-radius:12px; box-shadow:0 24px 70px rgba(0,0,0,.55); padding:26px 24px; text-align:center}
+.about-box h2{margin:4px 0 10px; font-weight:700}
+.about-box .ver{font-size:.6em; color:var(--faint); vertical-align:middle; font-weight:500}
+.about-desc{color:var(--mut); font-size:13.5px; line-height:1.6; margin:0 0 16px}
+.about-desc code{background:var(--bg-mod); padding:.1em .35em; border-radius:4px; font-size:.9em}
+.about-row{display:flex; justify-content:space-between; font-size:13px; padding:7px 2px; border-top:1px solid var(--line-soft); color:var(--mut)}
+.about-row b{color:var(--txt)}
+#about-open{width:100%; margin-top:16px}
+.about-note{color:var(--faint); font-size:12px; margin:10px 0 0; min-height:1px}
+.about-close{margin-top:14px}
+
+/* Ribbon: separador */
+.rib-sep{width:22px; height:1px; background:var(--line); margin:4px 0; flex:none}
+
+/* Barra do explorador de arquivos */
+.file-toolbar{display:flex; gap:2px; padding:0 0 4px; justify-content:flex-end}
+.ft{width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:none; border:0; border-radius:6px; color:var(--mut); cursor:pointer}
+.ft:hover{background:var(--hover); color:var(--txt)}
+.ft svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
+/* Seletor de vault (rodapé da sidebar) */
+.vault-switcher{flex:none; display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; border-top:1px solid var(--line-soft); color:var(--mut); padding:10px 14px; cursor:pointer; text-align:left}
+.vault-switcher:hover{background:var(--hover); color:var(--txt)}
+.vs-icon{font-size:14px; flex:none}
+.vs-name{flex:1; font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.vs-chev{width:13px; height:13px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; opacity:.55}
+
+#pane-graph .soon span{font-size:11px; color:var(--faint)}
+
+/* Sidebar oculta (toggle) */
+#app.sidebar-hidden{grid-template-columns:48px 1fr}
+#app.sidebar-hidden #sidebar{display:none}
+
+/* Toast (placeholders "em breve") */
+.toast{position:fixed; left:50%; bottom:32px; transform:translateX(-50%); background:var(--bg-mod); color:var(--txt); border:1px solid var(--line); border-radius:9px; padding:10px 18px; font-size:13px; z-index:80; box-shadow:0 12px 34px rgba(0,0,0,.45)}
+
+@media (max-width:760px){
+  #app{grid-template-columns:48px 1fr}
+  #sidebar{position:fixed; left:48px; top:0; z-index:20; width:260px; height:100%; transform:translateX(-110%); transition:.2s}
+  #sidebar.open{transform:none}
+  .view,.backlinks{padding-left:16px; padding-right:16px}
+  .editor{padding-left:16px; padding-right:16px}
+}

@@ -1,0 +1,21 @@
+services:
+  obsidian-web:
+    build: .
+    container_name: obsidian-web
+    restart: unless-stopped
+    environment:
+      VAULT_DIR: /vault
+      READ_ONLY: "false"      # "true" = somente leitura
+    volumes:
+      # ajuste o caminho do vault se o seu for diferente:
+      - /mnt/armazenamento/obsidian/vault:/vault
+    ports:
+      - "127.0.0.1:8099:8000" # só localhost, para teste; o túnel usa a rede
+    networks:
+      - default
+      - homelab
+
+networks:
+  homelab:
+    external: true
+    name: homelab_default
