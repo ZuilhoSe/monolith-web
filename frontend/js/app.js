@@ -3,7 +3,8 @@
 "use strict";
 import { ServerAdapter, LocalAdapter } from "./vault.js";
 import { mountInto } from "./render.js";
-import { buildNoteIndex, resolveNote, Indexer } from "./search.js";
+import { buildNoteIndex, resolveNote, Indexer, analyzeNote } from "./search.js";
+import { renderBase } from "./bases.js";
 import { renderGraph } from "./graph.js";
 
 const el = {};
@@ -58,6 +59,7 @@ async function start(adapter) {
   S.indexer.build(adapter, (d, t) => {
     el["index-state"].textContent = d < t ? `indexing ${d}/${t}…` : `${t} notes indexed`;
     if (d >= t && S.current) { showBacklinks(S.current); updateStatus(); if (el["search-input"].value) runSearch(); }
+    if (d >= t && S.current && !S.editing && el.view.querySelector(".base-embed")) renderView();
   });
   wireUI();
   newTab();   // start with an empty tab
@@ -74,7 +76,7 @@ function renderTree(nodes) {
       row.addEventListener("click", () => li.classList.toggle("collapsed"));
       li.appendChild(row); li.appendChild(renderTree(n.children));
     } else {
-      const row = nodeRow("📄", n.name, true); row.dataset.path = n.path;
+      const row = nodeRow(n.kind === "base" ? "▦" : "📄", n.name, true); row.dataset.path = n.path;
       row.addEventListener("click", () => openNote(n.path));
       li.appendChild(row);
     }
@@ -95,6 +97,7 @@ const ctx = () => ({
   resolveNote: (t) => resolveNote(S.index, t),
   resolvePath: (t) => t.includes("/") ? t : (S.basenames.get(t.toLowerCase()) || t),
   onNavigate: (p) => openNote(p),
+  renderBases: (root) => renderBasesIn(root),
   onToggleTask: async (newRaw) => { S.raw = newRaw; try { await S.adapter.writeText(S.current, newRaw); } catch {} updateStatus(); },
 });
 
@@ -124,9 +127,32 @@ async function loadIntoView(path) {
 }
 
 /* ---------- tabs ---------- */
+const isBase = (p) => /\.base$/i.test(p || "");
+
+/* Renders every ![[X.base]] placeholder (and a whole .base file) from the in-memory index. */
+async function renderBasesIn(root) {
+  for (const host of root.querySelectorAll(".base-embed")) {
+    const target = host.dataset.base;
+    const path = resolveNote(S.index, target);
+    if (!path) { host.innerHTML = `<div class="base-error">Base not found: ${target.replace(/[<>&]/g, "")}</div>`; continue; }
+    if (!S.indexer || !S.indexer.ready) { host.innerHTML = `<div class="base-note">Indexing the vault… the table appears in a moment.</div>`; continue; }
+    let text = "";
+    try { text = await S.adapter.readText(path); }
+    catch { host.innerHTML = `<div class="base-error">Couldn't read ${path}</div>`; continue; }
+    renderBase(host, text, S.indexer.docs, {
+      viewName: host.dataset.view || undefined,
+      onNavigate: (t) => {
+        const p = S.index.flat.some((f) => f.path === t) ? t : resolveNote(S.index, t);
+        if (p) openNote(p);
+      },
+    });
+  }
+}
+
 function tabName(t) {
   if (t.graph) return "Graph";
   if (!t.path) return "New tab";
+  if (isBase(t.path)) return t.path.split("/").pop().replace(/\.base$/i, "");
   return (S.index && S.index.flat.find((f) => f.path === t.path)?.name) || t.path.replace(/\.md$/i, "");
 }
 function renderTabs() {
@@ -216,8 +242,16 @@ function showEmptyTab() {
 
 async function renderView() {
   el.editor.hidden = true; el["graph-host"].hidden = true; el.scroll.hidden = false;
-  await mountInto(el.view, S.raw, ctx());
-  el["btn-edit"].hidden = S.readOnly;
+  if (isBase(S.current)) {
+    const name = S.current.split("/").pop().replace(/\.base$/i, "");
+    el.view.innerHTML = `<h1 class="base-title"></h1><div class="base-embed"></div>`;
+    el.view.querySelector(".base-title").textContent = name;
+    el.view.querySelector(".base-embed").dataset.base = S.current;
+    await renderBasesIn(el.view);
+  } else {
+    await mountInto(el.view, S.raw, ctx());
+  }
+  el["btn-edit"].hidden = S.readOnly || isBase(S.current);
   el["btn-save"].hidden = el["btn-cancel"].hidden = true;
   el["save-state"].textContent = ""; el.scroll.scrollTop = 0;
 }
@@ -266,10 +300,9 @@ async function save() {
   } catch { el["save-state"].className = "save-state err"; el["save-state"].textContent = "✗ save failed"; }
 }
 function reindexOne(path, text) {
-  const links = new Set(); const re = /!?\[\[([^\]]+?)\]\]/g; let m;
-  while ((m = re.exec(text))) { const p = resolveNote(S.index, m[1].split("|")[0]); if (p) links.add(p); }
+  if (isBase(path)) return;
   const name = S.index.flat.find((f) => f.path === path)?.name || path;
-  S.indexer.docs.set(path, { name, lower: text.toLowerCase(), links });
+  S.indexer.docs.set(path, analyzeNote(S.index, path, name, text));
 }
 function cancelEdit() {
   if (el.editor.value !== S.raw && !confirmDiscard()) return;
@@ -428,7 +461,7 @@ function wireUI() {
     const mod = e.ctrlKey || e.metaKey;
     if (mod && (e.key === "o" || e.key === "p")) { e.preventDefault(); openSwitcher(); }
     else if (mod && e.key === "s" && S.editing) { e.preventDefault(); save(); }
-    else if (mod && e.key === "e" && S.current && !S.readOnly) { e.preventDefault(); S.editing ? cancelEdit() : startEdit(); }
+    else if (mod && e.key === "e" && S.current && !S.readOnly && !isBase(S.current)) { e.preventDefault(); S.editing ? cancelEdit() : startEdit(); }
     else if (mod && e.shiftKey && (e.key === "f" || e.key === "F")) { e.preventDefault(); switchPane("search"); }
     else if (e.key === "Escape") { if (!el.about.hidden) closeAbout(); else if (!el.switcher.hidden) closeSwitcher(); }
   });

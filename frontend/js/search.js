@@ -1,16 +1,43 @@
 /* In-memory index (NEVER touches the vault): wikilink resolution, simple
    full-text content search, fuzzy quick-switcher and on-the-fly backlinks. */
 "use strict";
+import { splitFrontmatter } from "./bases.js";
 
 const WIKILINK_RE = /!?\[\[([^\]]+?)\]\]/g;
+const TAG_RE = /(^|\s)#([\p{L}\p{N}_\/-]*[\p{L}_\/-][\p{L}\p{N}_\/-]*)/gu;
+
+/* Everything the index keeps about one note, from its raw text. */
+export function analyzeNote(index, path, name, text) {
+  const { props, body } = splitFrontmatter(text);
+  const links = new Set();
+  let m;
+  WIKILINK_RE.lastIndex = 0;
+  while ((m = WIKILINK_RE.exec(text))) {
+    const p = resolveNote(index, m[1].split("|")[0]);
+    if (p) links.add(p);
+  }
+  const tags = new Set();
+  const fmTags = props && (props.tags ?? props.tag);
+  (Array.isArray(fmTags) ? fmTags : fmTags ? String(fmTags).split(/[\s,]+/) : [])
+    .forEach((t) => t && tags.add(String(t).replace(/^#/, "")));
+  const plain = body.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
+  TAG_RE.lastIndex = 0;
+  while ((m = TAG_RE.exec(plain))) tags.add(m[2]);
+  return { name, path, props: props || {}, tags: [...tags], lower: text.toLowerCase(), links };
+}
 
 export function buildNoteIndex(tree) {
   const byStem = new Map();   // lowercase basename -> path
   const byPath = new Map();   // lowercase path without .md -> path
   const flat = [];            // [{path, name}]
+  const bases = new Map();    // lowercase "name.base" / path -> path
   (function walk(nodes) {
     for (const n of nodes) {
-      if (n.type === "file") {
+      if (n.type === "file" && /\.base$/i.test(n.path)) {
+        bases.set(n.path.toLowerCase(), n.path);
+        const k = n.path.split("/").pop().toLowerCase();
+        if (!bases.has(k)) bases.set(k, n.path);
+      } else if (n.type === "file") {
         flat.push({ path: n.path, name: n.name });
         byPath.set(n.path.replace(/\.md$/i, "").toLowerCase(), n.path);
         const stem = n.name.toLowerCase();
@@ -19,12 +46,13 @@ export function buildNoteIndex(tree) {
     }
   })(tree);
   flat.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-  return { byStem, byPath, flat };
+  return { byStem, byPath, flat, bases };
 }
 
 export function resolveNote(index, target) {
   const clean = String(target).split(/[#^]/)[0].trim().toLowerCase();
   if (!clean) return null;
+  if (clean.endsWith(".base")) return index.bases.get(clean) || null;
   return index.byPath.get(clean) || index.byStem.get(clean) || null;
 }
 
@@ -38,14 +66,7 @@ export class Indexer {
     for (const f of files) {
       let text = "";
       try { text = await adapter.readText(f.path); } catch { /* skip */ }
-      const links = new Set();
-      let m;
-      WIKILINK_RE.lastIndex = 0;
-      while ((m = WIKILINK_RE.exec(text))) {
-        const p = resolveNote(this.index, m[1].split("|")[0]);
-        if (p) links.add(p);
-      }
-      this.docs.set(f.path, { name: f.name, lower: text.toLowerCase(), links });
+      this.docs.set(f.path, analyzeNote(this.index, f.path, f.name, text));
       if (onProgress && ++done % 25 === 0) onProgress(done, files.length);
     }
     this.ready = true;

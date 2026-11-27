@@ -65,6 +65,8 @@ def _tree(folder: Path) -> list:
                 items.append({"type": "dir", "name": e.name, "path": rel, "children": children})
         elif e.suffix.lower() == ".md":
             items.append({"type": "file", "name": e.stem, "path": rel})
+        elif e.suffix.lower() == ".base":
+            items.append({"type": "file", "name": e.stem, "path": rel, "kind": "base"})
     return items
 
 

@@ -2,6 +2,7 @@
    math (KaTeX) + Mermaid + callouts + clickable tasks.
    Depends on globals: marked, katex (vendor/*). Mermaid is optional. */
 "use strict";
+import { splitFrontmatter, propertiesHTML } from "./bases.js";
 
 const IMG_EXT = /\.(png|jpe?g|gif|svg|webp|avif|bmp)$/i;
 const CALLOUT_ICON = {
@@ -45,6 +46,8 @@ export function toHTML(raw) {
   s = s.replace(/!\[\[([^\]]+?)\]\]/g, (_, inner) => {
     const target = inner.split("|")[0].trim();
     if (IMG_EXT.test(target)) return tok(`<img class="embed" data-vault-src="${esc(target)}" alt="${esc(target)}">`);
+    const base = target.match(/^(.+?\.base)(?:#(.+))?$/i);
+    if (base) return tok(`<div class="base-embed" data-base="${esc(base[1])}" data-view="${esc(base[2] || "")}"></div>`);
     return tok(`<a class="wikilink embed-note" data-note="${esc(target)}">📄 ${esc(target.replace(/\.md$/i, ""))}</a>`);
   });
   s = s.replace(/\[\[([^\]]+?)\]\]/g, (_, inner) => {
@@ -61,9 +64,11 @@ export function toHTML(raw) {
 
 /* Mounts the HTML into the container and runs the async/interactive steps. */
 export async function mountInto(container, raw, ctx) {
-  container.innerHTML = toHTML(raw);
+  const { props, body } = splitFrontmatter(raw);
+  container.innerHTML = (props && Object.keys(props).length ? propertiesHTML(props) : "") + toHTML(props ? body : raw);
   transformCallouts(container);
   wireWikilinks(container, ctx);
+  if (ctx.renderBases) await ctx.renderBases(container);
   await resolveImages(container, ctx);
   wireTasks(container, raw, ctx);
   await runMermaid(container);

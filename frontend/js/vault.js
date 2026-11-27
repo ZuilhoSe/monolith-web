@@ -72,6 +72,8 @@ export class LocalAdapter {
         this.files.set(path, handle);
         if (name.toLowerCase().endsWith(".md"))
           items.push({ type: "file", name: name.replace(/\.md$/i, ""), path });
+        else if (name.toLowerCase().endsWith(".base"))
+          items.push({ type: "file", name: name.replace(/\.base$/i, ""), path, kind: "base" });
       }
     }
     items.sort((a, b) => a.type === b.type

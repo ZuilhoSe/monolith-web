@@ -59,6 +59,8 @@ Monolith is built around three rules:
 - 📊 **Mermaid** diagrams
 - 💬 **Callouts** (`> [!note]`, `> [!warning]`, …) with Obsidian's colors
 - ☑️ **Clickable tasks** that save back to the file
+- 🗃️ **Bases**: `.base` table views (filters, formulas, sorting) render from your notes' properties, embedded or opened directly
+- 🏷️ **Properties**: frontmatter shown as an Obsidian-style properties panel
 - ✏️ Edit and save notes (`Ctrl+E`, `Ctrl+S`), create new notes
 - 🔒 Optional read-only mode
 
@@ -135,7 +137,6 @@ Pick one and help build it!
 - [ ] Daily notes
 - [ ] Command palette
 - [ ] Canvas (`.canvas`) viewer
-- [ ] Frontmatter / properties view
 - [ ] Light theme
 - [ ] Mobile layout polish
 - [ ] PWA / offline install

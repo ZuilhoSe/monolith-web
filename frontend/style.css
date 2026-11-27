@@ -244,3 +244,37 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .landing-foot a{color:var(--acc); text-decoration:none; font-weight:600}
 .landing-foot a:hover{text-decoration:underline}
 .landing-card .tagline{margin:-6px 0 14px; font-size:15px; font-weight:600; color:var(--acc)}
+
+/* Properties (frontmatter), Obsidian-style */
+.properties{border-bottom:1px solid var(--line-soft); padding:0 0 12px; margin:0 0 20px; font-size:13.5px}
+.properties-title{color:var(--mut); font-size:12px; font-weight:600; margin:0 0 6px}
+.prop-row{display:grid; grid-template-columns:minmax(110px,180px) 1fr; gap:12px; padding:4px 6px; border-radius:6px}
+.prop-row:hover{background:var(--hover)}
+.prop-key{color:var(--mut)}
+.prop-val{color:var(--txt); word-break:break-word}
+.prop-empty{color:var(--faint); font-style:italic}
+
+/* Bases (table views) */
+.base-host{margin:12px 0 20px; font-size:13.5px}
+.base-title{margin-bottom:8px}
+.base-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--line-soft); margin-bottom:8px}
+.base-tab{background:none; border:0; border-bottom:2px solid transparent; color:var(--mut); padding:6px 10px;
+  font:inherit; font-size:13px; cursor:pointer; margin-bottom:-1px}
+.base-tab:hover{color:var(--txt)}
+.base-tab.active{color:var(--txt); border-bottom-color:var(--acc)}
+.base-count{color:var(--faint); font-size:12px; margin:4px 2px 8px}
+.base-scroll{overflow-x:auto; border:1px solid var(--line-soft); border-radius:8px}
+.base-table{border-collapse:collapse; width:100%; margin:0; font-size:13px}
+.base-table th{position:sticky; top:0; background:var(--bg-sec); color:var(--mut); font-weight:600; text-align:left;
+  padding:7px 10px; border-bottom:1px solid var(--line); white-space:nowrap}
+.base-table td{padding:6px 10px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+.base-table tr:last-child td{border-bottom:0}
+.base-table tbody tr:hover{background:var(--hover)}
+.base-table a{color:var(--acc); cursor:pointer; text-decoration:none}
+.base-table a:hover{text-decoration:underline}
+.base-empty{color:var(--faint); text-align:center; padding:18px !important}
+.base-sep{color:var(--faint)}
+.base-true{color:var(--ok)} .base-false{color:var(--faint)}
+.base-note,.base-error{padding:10px 12px; border-radius:8px; background:var(--bg-sec); color:var(--mut); font-size:13px}
+.base-error{color:var(--err)}
+.base-note-inline{color:var(--faint)}
