@@ -136,9 +136,23 @@ Pick one and help build it!
 - [ ] Command palette
 - [ ] Canvas (`.canvas`) viewer
 - [ ] Frontmatter / properties view
-- [ ] Light theme and Obsidian CSS snippet support
+- [ ] Light theme
 - [ ] Mobile layout polish
 - [ ] PWA / offline install
+
+### Next big step: Obsidian themes & plugins, without the Obsidian app
+
+The long-term plan is to re-implement Obsidian's **public, MIT-licensed plugin API** on top of
+Monolith, so community themes, CSS snippets and plugins can run in the browser, fully open source,
+without downloading the proprietary app and without writing into your vault.
+
+1. **Themes & snippets:** Obsidian-compatible DOM and CSS variables
+2. **`MetadataCache` + CodeMirror 6 editor** with live preview
+3. **Plugin loader + core API**, with [Dataview](https://github.com/blacksmithgu/obsidian-dataview) as the first target
+4. **Commands, settings, custom views**, guided by a public compatibility list
+
+Full plan, rules (clean-room, opt-in plugins, vault stays read-only) and compatibility list:
+**[docs/ROADMAP.md](docs/ROADMAP.md)**.
 
 ## Contributing
 
