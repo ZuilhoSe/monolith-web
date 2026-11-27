@@ -6,8 +6,8 @@
 Open your notes in any browser — from a local folder or your own server — without changing a single file.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-7c5cff.svg)](LICENSE)
-[![Live demo](https://img.shields.io/badge/demo-try%20it%20now-7c5cff.svg)](https://zuilhose.github.io/obsidian-web/)
-[![No build step](https://img.shields.io/badge/build-none-555.svg)](#architecture)
+[![Live demo](https://img.shields.io/badge/demo-try_it_now-7c5cff.svg)](https://zuilhose.github.io/obsidian-web/)
+[![No build step](https://img.shields.io/badge/build_step-none-555555.svg)](#architecture)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ### [▶ Try it now — no install, no upload](https://zuilhose.github.io/obsidian-web/)
