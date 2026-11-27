@@ -1,6 +1,6 @@
-/* Pipeline de render: Markdown (GFM) + wikilinks + embeds de imagem +
-   math (KaTeX) + Mermaid + callouts + tarefas clicáveis.
-   Depende dos globais: marked, katex (vendor/*). Mermaid é opcional. */
+/* Render pipeline: Markdown (GFM) + wikilinks + image embeds +
+   math (KaTeX) + Mermaid + callouts + clickable tasks.
+   Depends on globals: marked, katex (vendor/*). Mermaid is optional. */
 "use strict";
 
 const IMG_EXT = /\.(png|jpe?g|gif|svg|webp|avif|bmp)$/i;
@@ -22,26 +22,26 @@ function katexHTML(expr, display) {
   }
 }
 
-/* Converte o Markdown cru em HTML, protegendo código/math e tratando o que o
-   Obsidian usa. Devolve a string HTML (com atributos data-* p/ passos assíncronos). */
+/* Converts raw Markdown to HTML, protecting code/math and handling Obsidian's
+   syntax. Returns an HTML string (with data-* attributes for async steps). */
 export function toHTML(raw) {
   const store = [];
   const tok = (html) => { store.push(html); return `<!--OW${store.length - 1}-->`; };
   let s = raw;
 
-  // 1. blocos de código (``` ```), inclui mermaid
+  // 1. fenced code blocks (``` ```), including mermaid
   s = s.replace(/```([^\n`]*)\n([\s\S]*?)```/g, (_, lang, code) => {
     lang = (lang || "").trim().toLowerCase();
     if (lang === "mermaid") return tok(`<div class="mermaid">${esc(code.trimEnd())}</div>`);
     const cls = lang ? ` class="language-${esc(lang)}"` : "";
     return tok(`<pre><code${cls}>${esc(code.replace(/\n$/, ""))}</code></pre>`);
   });
-  // 2. código inline (`...`)
+  // 2. inline code (`...`)
   s = s.replace(/`([^`\n]+?)`/g, (_, c) => tok(`<code>${esc(c)}</code>`));
-  // 3. math em bloco $$...$$ e inline $...$
+  // 3. block math $$...$$ and inline $...$
   s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, e) => tok(katexHTML(e.trim(), true)));
   s = s.replace(/(^|[^\\$])\$([^\$\n]+?)\$/g, (m, pre, e) => pre + tok(katexHTML(e.trim(), false)));
-  // 4. embeds e wikilinks
+  // 4. embeds and wikilinks
   s = s.replace(/!\[\[([^\]]+?)\]\]/g, (_, inner) => {
     const target = inner.split("|")[0].trim();
     if (IMG_EXT.test(target)) return tok(`<img class="embed" data-vault-src="${esc(target)}" alt="${esc(target)}">`);
@@ -54,12 +54,12 @@ export function toHTML(raw) {
   });
 
   let html = window.marked.parse(s, { gfm: true, breaks: false });
-  // reinsere os tokens protegidos
+  // restore the protected tokens
   html = html.replace(/<!--OW(\d+)-->/g, (_, i) => store[+i]);
   return html;
 }
 
-/* Monta o HTML no container e resolve os passos assíncronos/interativos. */
+/* Mounts the HTML into the container and runs the async/interactive steps. */
 export async function mountInto(container, raw, ctx) {
   container.innerHTML = toHTML(raw);
   transformCallouts(container);
@@ -77,7 +77,7 @@ function transformCallouts(root) {
     const type = m[1].toLowerCase();
     const title = m[2].trim() || type.charAt(0).toUpperCase() + type.slice(1);
     const icon = CALLOUT_ICON[type] || "📌";
-    // remove só a linha "[!type] title" (até a 1ª quebra), mantém o resto como corpo
+    // strip only the "[!type] title" line (up to the first break); the rest is the body
     let body = html.replace(/^\s*<p>\s*\[!\w+\][+-]?\s*[^\n<]*(?:\n|<br\s*\/?>)?/i, "<p>")
                    .replace(/^<p>\s*<\/p>\s*/i, "");
     const div = document.createElement("div");
@@ -95,7 +95,7 @@ function wireWikilinks(root, ctx) {
       a.addEventListener("click", (e) => { e.preventDefault(); ctx.onNavigate(path); });
     } else {
       a.classList.add("missing");
-      a.title = "nota não encontrada: " + target;
+      a.title = "note not found: " + target;
       a.addEventListener("click", (e) => e.preventDefault());
     }
   });
@@ -103,7 +103,7 @@ function wireWikilinks(root, ctx) {
 
 async function resolveImages(root, ctx) {
   const imgs = [...root.querySelectorAll("img[data-vault-src]")];
-  // imagens padrão ![](caminho) que não são http/data/blob também viram vault
+  // standard images ![](path) that aren't http/data/blob also resolve from the vault
   root.querySelectorAll("img:not([data-vault-src])").forEach((img) => {
     const src = img.getAttribute("src") || "";
     if (!/^(https?:|data:|blob:)/.test(src)) { img.setAttribute("data-vault-src", decodeURIComponent(src)); imgs.push(img); }
@@ -118,7 +118,7 @@ async function resolveImages(root, ctx) {
 function wireTasks(root, raw, ctx) {
   const boxes = [...root.querySelectorAll('li input[type="checkbox"]')];
   const lines = raw.split("\n");
-  // mapeia cada checkbox ao índice da linha de tarefa correspondente, em ordem
+  // map each checkbox, in order, to the index of its task line
   const taskLines = [];
   lines.forEach((ln, i) => { if (/^\s*[-*+]\s+\[[ xX]\]/.test(ln)) taskLines.push(i); });
   boxes.forEach((box, k) => {
@@ -140,5 +140,5 @@ async function runMermaid(root) {
     window.mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "strict" });
     _mermaidInit = true;
   }
-  try { await window.mermaid.run({ nodes }); } catch { /* deixa o código cru visível */ }
+  try { await window.mermaid.run({ nodes }); } catch { /* leave the raw code visible */ }
 }

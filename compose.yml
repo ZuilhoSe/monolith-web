@@ -1,3 +1,8 @@
+# Obsidian Web — minimal self-hosted setup.
+#   VAULT_PATH=/path/to/your/vault docker compose up -d --build
+# Then open http://localhost:8099
+# Put it behind a reverse proxy that handles auth (Authelia, Cloudflare Access,
+# Tailscale, basic auth...) before exposing it to the internet.
 services:
   obsidian-web:
     build: .
@@ -5,17 +10,8 @@ services:
     restart: unless-stopped
     environment:
       VAULT_DIR: /vault
-      READ_ONLY: "false"      # "true" = somente leitura
+      READ_ONLY: "${READ_ONLY:-false}"   # "true" = read-only
     volumes:
-      # ajuste o caminho do vault se o seu for diferente:
-      - /mnt/armazenamento/obsidian/vault:/vault
+      - "${VAULT_PATH:-./examples/demo-vault}:/vault"
     ports:
-      - "127.0.0.1:8099:8000" # só localhost, para teste; o túnel usa a rede
-    networks:
-      - default
-      - homelab
-
-networks:
-  homelab:
-    external: true
-    name: homelab_default
+      - "127.0.0.1:${PORT:-8099}:8000"   # localhost only; your proxy reaches it from here

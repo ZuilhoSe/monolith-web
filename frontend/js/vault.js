@@ -1,8 +1,8 @@
-/* Vault adapters: mesma interface, dois back-ends.
-   - ServerAdapter: fala com o backend FastAPI (vault num servidor).
-   - LocalAdapter: usa a File System Access API (pasta local, sem backend).
-   Interface: name, readOnly, tree, readText(path), writeText(path,txt),
-   fileURL(path) -> URL utilizável em <img>. */
+/* Vault adapters: one interface, two back-ends.
+   - ServerAdapter: talks to the FastAPI backend (vault on a server).
+   - LocalAdapter: uses the File System Access API (local folder, no backend).
+   Interface: name, readOnly, tree, readText(path), writeText(path, txt),
+   fileURL(path) -> URL usable in <img>. */
 "use strict";
 
 export class ServerAdapter {
@@ -44,7 +44,7 @@ export class LocalAdapter {
     this.readOnly = false; this.tree = [];
     this.files = new Map();  // path -> FileSystemFileHandle
     this.dirs = new Map();   // path -> FileSystemDirectoryHandle
-    this._urls = new Map();  // cache de blob URLs
+    this._urls = new Map();  // blob URL cache
   }
   static supported() { return typeof window !== "undefined" && "showDirectoryPicker" in window; }
   static async open() {

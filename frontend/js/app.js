@@ -1,5 +1,5 @@
-/* Obsidian Web — app (glue). Dual-mode, render rico, busca, quick-switcher,
-   backlinks e UI no estilo Obsidian. */
+/* Obsidian Web — app (glue). Dual-mode, rich rendering, search, quick-switcher,
+   backlinks and an Obsidian-style UI. */
 "use strict";
 import { ServerAdapter, LocalAdapter } from "./vault.js";
 import { mountInto } from "./render.js";
@@ -28,7 +28,7 @@ if (window.marked) window.marked.setOptions({ gfm: true, breaks: false });
   el.landing.hidden = false;
   if (!LocalAdapter.supported()) { el.unsupported.hidden = false; el["open-folder"].disabled = true; }
   el["open-folder"].addEventListener("click", async () => {
-    try { start(await LocalAdapter.open()); } catch { /* cancelado */ }
+    try { start(await LocalAdapter.open()); } catch { /* cancelled */ }
   });
 })();
 
@@ -39,7 +39,7 @@ async function start(adapter) {
   el.landing.hidden = true; el.app.hidden = false;
   el["vault-name"].textContent = adapter.name;
   el["vs-name"].textContent = adapter.name;
-  el["mode-badge"].textContent = adapter.mode === "local" ? "Local" : "Servidor";
+  el["mode-badge"].textContent = adapter.mode === "local" ? "Local" : "Server";
   el["mode-badge"].className = "mode-badge " + adapter.mode;
 
   const tree = await adapter.loadTree();
@@ -54,16 +54,16 @@ async function start(adapter) {
   } catch { /* ok */ }
 
   S.indexer = new Indexer(S.index);
-  el["index-state"].textContent = "indexando…";
+  el["index-state"].textContent = "indexing…";
   S.indexer.build(adapter, (d, t) => {
-    el["index-state"].textContent = d < t ? `indexando ${d}/${t}…` : `${t} notas indexadas`;
+    el["index-state"].textContent = d < t ? `indexing ${d}/${t}…` : `${t} notes indexed`;
     if (d >= t && S.current) { showBacklinks(S.current); updateStatus(); if (el["search-input"].value) runSearch(); }
   });
   wireUI();
-  newTab();   // começa com uma aba vazia
+  newTab();   // start with an empty tab
 }
 
-/* ---------- árvore ---------- */
+/* ---------- file tree ---------- */
 function renderTree(nodes) {
   const ul = document.createElement("ul");
   for (const n of nodes) {
@@ -89,7 +89,7 @@ function nodeRow(ico, name, isFile) {
   d.querySelector(".label").textContent = name; return d;
 }
 
-/* ---------- abrir / render ---------- */
+/* ---------- open / render ---------- */
 const ctx = () => ({
   adapter: S.adapter, readOnly: S.readOnly,
   resolveNote: (t) => resolveNote(S.index, t),
@@ -119,14 +119,14 @@ async function loadIntoView(path) {
     showBacklinks(path); updateStatus();
   } catch {
     S.current = null; el.scroll.hidden = false; el.editor.hidden = true; el.backlinks.hidden = true;
-    el.view.innerHTML = `<p class="err">Não consegui abrir a nota.</p>`;
+    el.view.innerHTML = `<p class="err">Couldn't open the note.</p>`;
   }
 }
 
-/* ---------- abas ---------- */
+/* ---------- tabs ---------- */
 function tabName(t) {
-  if (t.graph) return "Grafo";
-  if (!t.path) return "Nova aba";
+  if (t.graph) return "Graph";
+  if (!t.path) return "New tab";
   return (S.index && S.index.flat.find((f) => f.path === t.path)?.name) || t.path.replace(/\.md$/i, "");
 }
 function renderTabs() {
@@ -134,7 +134,7 @@ function renderTabs() {
   S.tabs.forEach((t, i) => {
     const d = document.createElement("div");
     d.className = "tab-item" + (i === S.active ? " active" : "");
-    d.innerHTML = `<span class="tab-label"></span><span class="tab-close" title="Fechar aba">×</span>`;
+    d.innerHTML = `<span class="tab-label"></span><span class="tab-close" title="Close tab">×</span>`;
     d.querySelector(".tab-label").textContent = tabName(t);
     d.addEventListener("click", (e) => {
       if (e.target.classList.contains("tab-close")) { e.stopPropagation(); closeTab(i); }
@@ -191,8 +191,8 @@ function showGraph() {
       }
     }
   }
-  el["sb-count"].textContent = `${nodes.length} notas · ${edges.length} links`;
-  el["sb-backlinks"].textContent = S.indexer && S.indexer.ready ? "" : "indexando…";
+  el["sb-count"].textContent = `${nodes.length} notes · ${edges.length} links`;
+  el["sb-backlinks"].textContent = S.indexer && S.indexer.ready ? "" : "indexing…";
   renderGraph(el["graph-host"], nodes, edges, (path) => openNote(path));
 }
 function showEmptyTab() {
@@ -203,9 +203,9 @@ function showEmptyTab() {
   el["sb-backlinks"].textContent = ""; el["sb-count"].textContent = "";
   highlight(null);
   el.view.innerHTML = `<div class="empty-tab">
-    <a data-act="new">✏️ Criar nova nota <kbd>Ctrl+N</kbd></a>
-    <a data-act="open">🔍 Ir para arquivo <kbd>Ctrl+O</kbd></a>
-    <a data-act="close">✕ Fechar aba</a></div>`;
+    <a data-act="new">✏️ Create new note <kbd>Ctrl+N</kbd></a>
+    <a data-act="open">🔍 Go to file <kbd>Ctrl+O</kbd></a>
+    <a data-act="close">✕ Close tab</a></div>`;
   el.view.querySelectorAll(".empty-tab a").forEach((a) => a.addEventListener("click", () => {
     const act = a.dataset.act;
     if (act === "new") newNote();
@@ -239,14 +239,14 @@ function showBacklinks(path) {
 function updateStatus() {
   if (!S.current) { el["sb-backlinks"].textContent = ""; el["sb-count"].textContent = ""; return; }
   const words = (S.raw.trim().match(/\S+/g) || []).length;
-  el["sb-count"].textContent = `${words} palavra${words === 1 ? "" : "s"} · ${S.raw.length} caracteres`;
+  el["sb-count"].textContent = `${words} word${words === 1 ? "" : "s"} · ${S.raw.length} characters`;
   if (S.indexer && S.indexer.ready) {
     const n = S.indexer.backlinks(S.current).length;
     el["sb-backlinks"].textContent = `${n} backlink${n === 1 ? "" : "s"}`;
   } else el["sb-backlinks"].textContent = "";
 }
 
-/* ---------- editar ---------- */
+/* ---------- editing ---------- */
 function startEdit() {
   S.editing = true; el.scroll.hidden = true; el.editor.hidden = false; el.editor.value = S.raw;
   el["btn-edit"].hidden = true;
@@ -255,15 +255,15 @@ function startEdit() {
 }
 async function save() {
   if (!S.current) return;
-  el["save-state"].className = "save-state"; el["save-state"].textContent = "salvando…";
+  el["save-state"].className = "save-state"; el["save-state"].textContent = "saving…";
   try {
     await S.adapter.writeText(S.current, el.editor.value);
     S.raw = el.editor.value; S.editing = false;
     await renderView(); showBacklinks(S.current); updateStatus();
-    el["save-state"].className = "save-state ok"; el["save-state"].textContent = "✓ salvo";
+    el["save-state"].className = "save-state ok"; el["save-state"].textContent = "✓ saved";
     setTimeout(() => (el["save-state"].textContent = ""), 2500);
     if (S.indexer && S.indexer.ready) reindexOne(S.current, S.raw);
-  } catch { el["save-state"].className = "save-state err"; el["save-state"].textContent = "✗ erro ao salvar"; }
+  } catch { el["save-state"].className = "save-state err"; el["save-state"].textContent = "✗ save failed"; }
 }
 function reindexOne(path, text) {
   const links = new Set(); const re = /!?\[\[([^\]]+?)\]\]/g; let m;
@@ -275,16 +275,16 @@ function cancelEdit() {
   if (el.editor.value !== S.raw && !confirmDiscard()) return;
   S.editing = false; renderView(); showBacklinks(S.current); updateStatus();
 }
-function confirmDiscard() { return !S.editing || el.editor.value === S.raw || confirm("Descartar alterações não salvas?"); }
+function confirmDiscard() { return !S.editing || el.editor.value === S.raw || confirm("Discard unsaved changes?"); }
 
-/* ---------- busca / switcher ---------- */
+/* ---------- search / switcher ---------- */
 function runSearch() {
   const q = el["search-input"].value.trim();
-  if (!S.indexer || !S.indexer.ready) { el["search-results"].innerHTML = `<div class="hint">aguarde a indexação…</div>`; return; }
+  if (!S.indexer || !S.indexer.ready) { el["search-results"].innerHTML = `<div class="hint">indexing, please wait…</div>`; return; }
   const res = S.indexer.search(q);
   el["search-results"].innerHTML = "";
   if (!q) return;
-  if (!res.length) { el["search-results"].innerHTML = `<div class="hint">nada encontrado</div>`; return; }
+  if (!res.length) { el["search-results"].innerHTML = `<div class="hint">no results</div>`; return; }
   for (const r of res) {
     const d = document.createElement("div"); d.className = "result";
     d.innerHTML = `<div class="r-name"></div><div class="r-snip"></div>`;
@@ -344,32 +344,32 @@ function switchPane(pane) {
   if (pane === "search") el["search-input"].focus();
 }
 
-/* ---------- Sobre / trocar vault ---------- */
+/* ---------- About / switch vault ---------- */
 function openAbout() {
   const a = S.adapter, local = a && a.mode === "local";
-  el["about-mode"].textContent = a ? (local ? "Local (pasta no navegador)" : "Servidor") : "—";
+  el["about-mode"].textContent = a ? (local ? "Local (browser folder)" : "Server") : "—";
   el["about-vault"].textContent = a ? a.name : "—";
   const sup = LocalAdapter.supported();
-  el["about-open"].textContent = local ? "📂 Trocar pasta do vault" : "📂 Abrir pasta local (trocar vault)";
+  el["about-open"].textContent = local ? "📂 Switch vault folder" : "📂 Open local folder (switch vault)";
   el["about-open"].disabled = !sup;
-  el["about-note"].textContent = !sup ? "Seu navegador não abre pastas locais (use Chrome/Edge)."
-    : (a && a.mode === "server" ? "Troca pro modo local; pra voltar ao servidor, recarregue a página." : "");
+  el["about-note"].textContent = !sup ? "Your browser can't open local folders (use Chrome/Edge)."
+    : (a && a.mode === "server" ? "Switches to local mode; to go back to the server, reload the page." : "");
   el.about.hidden = false;
 }
 function closeAbout() { el.about.hidden = true; }
 
-/* ---------- toast / ações ---------- */
+/* ---------- toast / actions ---------- */
 let _toastT;
 function toast(msg) {
   el.toast.textContent = msg; el.toast.hidden = false;
   clearTimeout(_toastT); _toastT = setTimeout(() => (el.toast.hidden = true), 2200);
 }
-function soon(name) { toast("🚧 " + name + " — em breve"); }
+function soon(name) { toast("🚧 " + name + " — coming soon"); }
 function toggleSidebar() { el.app.classList.toggle("sidebar-hidden"); }
 function collapseAll() { el.tree.querySelectorAll("li.dir").forEach((d) => d.classList.add("collapsed")); }
 async function newNote() {
-  if (S.readOnly) { toast("Vault somente-leitura"); return; }
-  const name = (prompt("Nome da nova nota:", "Sem título") || "").trim();
+  if (S.readOnly) { toast("Read-only vault"); return; }
+  const name = (prompt("New note name:", "Untitled") || "").trim();
   if (!name) return;
   const path = name.endsWith(".md") ? name : name + ".md";
   const body = "# " + name.replace(/\.md$/i, "") + "\n\n";
@@ -381,8 +381,8 @@ async function newNote() {
     try { for (const p of await S.adapter.allFiles()) { const b = p.split("/").pop().toLowerCase(); if (!S.basenames.has(b)) S.basenames.set(b, p); } } catch {}
     if (S.indexer && S.indexer.ready) reindexOne(path, body);
     await openNote(path); startEdit();
-    toast("Nota criada");
-  } catch { toast("Erro ao criar a nota"); }
+    toast("Note created");
+  } catch { toast("Error creating note"); }
 }
 
 function handleRib(r) {
@@ -398,7 +398,7 @@ function handleFt(b) {
 
 let _wired = false;
 function wireUI() {
-  if (_wired) return;            // idempotente: start() pode rodar de novo ao trocar vault
+  if (_wired) return;            // idempotent: start() runs again when switching vaults
   _wired = true;
   el.ribbon.querySelectorAll(".rib").forEach((r) => { if (r.id !== "rib-about") r.addEventListener("click", () => handleRib(r)); });
   document.querySelectorAll(".file-toolbar .ft").forEach((b) => b.addEventListener("click", () => handleFt(b)));

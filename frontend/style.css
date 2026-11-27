@@ -44,7 +44,7 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .inp:focus{border-color:var(--acc-strong)}
 .soon{color:var(--faint); font-size:13px; padding:20px 8px; text-align:center}
 
-/* Árvore de arquivos */
+/* File tree */
 .tree{overflow:auto; flex:1; min-height:0; padding-bottom:20px; font-size:13.5px}
 .tree ul{list-style:none; margin:0; padding-left:13px}
 .tree > ul{padding-left:2px}
@@ -57,7 +57,7 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .tree .dir.collapsed > ul{display:none}
 .tree .file-ico{flex:none; width:14px; opacity:.5; font-size:11px}
 
-/* Resultados (busca / switcher) */
+/* Results (search / switcher) */
 .results{overflow:auto; flex:1; min-height:0}
 .index-state{font-size:11px; color:var(--faint); padding:2px 4px 6px}
 .result{padding:7px 9px; border-radius:7px; cursor:pointer}
@@ -98,7 +98,7 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .tab-new svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 #tabbar .vh-actions{padding:0 12px; align-items:center; margin-left:0}
 
-/* Aba vazia (ações estilo Obsidian) */
+/* Empty tab (Obsidian-style actions) */
 .empty-tab{display:flex; flex-direction:column; align-items:center; gap:16px; padding-top:22vh}
 .empty-tab a{color:var(--acc); cursor:pointer; font-size:16px; display:flex; align-items:center; gap:10px}
 .empty-tab a:hover{text-decoration:underline}
@@ -187,11 +187,11 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .sw-name{font-weight:600; font-size:14px}
 .sw-path{color:var(--faint); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 
-/* Nome do vault clicável (abre Sobre / trocar vault) */
+/* Clickable vault name (opens About / switch vault) */
 .vault-name{cursor:pointer}
 .vault-name:hover{color:#fff}
 
-/* Modal genérico (Sobre) */
+/* Generic modal (About) */
 .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:60; padding:20px}
 .modal-box{width:min(420px,92vw); background:var(--bg-sec); border:1px solid var(--line); border-radius:12px; box-shadow:0 24px 70px rgba(0,0,0,.55); padding:26px 24px; text-align:center}
 .about-box h2{margin:4px 0 10px; font-weight:700}
@@ -202,6 +202,8 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .about-row b{color:var(--txt)}
 #about-open{width:100%; margin-top:16px}
 .about-note{color:var(--faint); font-size:12px; margin:10px 0 0; min-height:1px}
+.about-repo{display:block; margin:14px 0 0; font-size:13px; color:var(--acc); text-decoration:none; font-weight:600}
+.about-repo:hover{text-decoration:underline}
 .about-close{margin-top:14px}
 
 /* Ribbon: separador */
@@ -213,7 +215,7 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .ft:hover{background:var(--hover); color:var(--txt)}
 .ft svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 
-/* Seletor de vault (rodapé da sidebar) */
+/* Vault switcher (sidebar footer) */
 .vault-switcher{flex:none; display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; border-top:1px solid var(--line-soft); color:var(--mut); padding:10px 14px; cursor:pointer; text-align:left}
 .vault-switcher:hover{background:var(--hover); color:var(--txt)}
 .vs-icon{font-size:14px; flex:none}
@@ -236,3 +238,8 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
   .view,.backlinks{padding-left:16px; padding-right:16px}
   .editor{padding-left:16px; padding-right:16px}
 }
+
+/* Landing footer (open-source link) */
+.landing-foot{margin-top:22px; font-size:12.5px; color:var(--faint)}
+.landing-foot a{color:var(--acc); text-decoration:none; font-weight:600}
+.landing-foot a:hover{text-decoration:underline}

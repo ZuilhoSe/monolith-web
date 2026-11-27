@@ -1,14 +1,15 @@
 """
-Obsidian Web — backend (modo servidor).
+Obsidian Web — backend (server mode).
 
-Cliente web self-hosted, open-source e NÃO-INVASIVO para um vault do Obsidian:
-lê/escreve os .md como estão, nunca grava índice/meta dentro do vault, e delega
-a autenticação ao reverse proxy. Também serve o frontend, que funciona tanto
-neste modo servidor quanto em modo local (pasta no navegador, sem backend).
+A self-hosted, open-source and NON-INVASIVE web client for an Obsidian vault:
+it reads/writes your .md files as-is, never writes an index or metadata into
+the vault, and delegates authentication to your reverse proxy. It also serves
+the frontend, which works both in this server mode and in local mode (a folder
+opened in the browser, no backend at all).
 
 Env:
-  VAULT_DIR   caminho do vault no container (padrão: /vault)
-  READ_ONLY   "true" desliga a escrita (padrão: false)
+  VAULT_DIR   vault path inside the container (default: /vault)
+  READ_ONLY   "true" disables writing (default: false)
 """
 import mimetypes
 import os
@@ -23,13 +24,13 @@ READ_ONLY = os.environ.get("READ_ONLY", "false").lower() in ("1", "true", "yes")
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 HIDDEN_PREFIXES = (".",)
 
-app = FastAPI(title="Obsidian Web", version="0.2.0")
+app = FastAPI(title="Obsidian Web", version="0.3.0")
 
 
 @app.middleware("http")
 async def no_cache(request, call_next):
-    """Evita que proxies/CDN (ex.: Cloudflare) sirvam assets estáticos velhos
-    depois de um deploy. 'no-cache' força revalidação por ETag a cada carga."""
+    """Stops proxies/CDNs (e.g. Cloudflare) from serving stale static assets
+    after a deploy. 'no-cache' forces ETag revalidation on every load."""
     resp = await call_next(request)
     if not request.url.path.startswith("/api"):
         resp.headers["Cache-Control"] = "no-cache"
@@ -40,7 +41,7 @@ def _safe(rel: str) -> Path:
     rel = (rel or "").lstrip("/")
     p = (VAULT / rel).resolve()
     if p != VAULT and VAULT not in p.parents:
-        raise HTTPException(status_code=400, detail="caminho fora do vault")
+        raise HTTPException(status_code=400, detail="path outside the vault")
     return p
 
 
@@ -75,13 +76,13 @@ def meta():
 @app.get("/api/tree")
 def tree():
     if not VAULT.is_dir():
-        raise HTTPException(status_code=500, detail=f"vault não encontrado: {VAULT}")
+        raise HTTPException(status_code=500, detail=f"vault not found: {VAULT}")
     return {"tree": _tree(VAULT)}
 
 
 @app.get("/api/files")
 def all_files():
-    """Todos os arquivos do vault (inclui imagens/anexos) p/ resolver embeds por nome."""
+    """Every file in the vault (incl. images/attachments), to resolve embeds by name."""
     out = []
     if VAULT.is_dir():
         for p in VAULT.rglob("*"):
@@ -94,16 +95,16 @@ def all_files():
 def read_file(path: str = Query(...)):
     p = _safe(path)
     if not p.is_file():
-        raise HTTPException(status_code=404, detail="nota não encontrada")
+        raise HTTPException(status_code=404, detail="note not found")
     return p.read_text(encoding="utf-8")
 
 
 @app.get("/api/raw")
 def read_raw(path: str = Query(...)):
-    """Bytes crus de qualquer arquivo do vault (imagens, anexos, embeds)."""
+    """Raw bytes of any vault file (images, attachments, embeds)."""
     p = _safe(path)
     if not p.is_file():
-        raise HTTPException(status_code=404, detail="arquivo não encontrado")
+        raise HTTPException(status_code=404, detail="file not found")
     ctype, _ = mimetypes.guess_type(str(p))
     return FileResponse(str(p), media_type=ctype or "application/octet-stream")
 
@@ -111,10 +112,10 @@ def read_raw(path: str = Query(...)):
 @app.put("/api/file")
 def write_file(path: str = Query(...), body: str = Body(..., media_type="text/plain")):
     if READ_ONLY:
-        raise HTTPException(status_code=403, detail="modo somente-leitura")
+        raise HTTPException(status_code=403, detail="read-only mode")
     p = _safe(path)
     if p.suffix.lower() != ".md":
-        raise HTTPException(status_code=400, detail="só .md")
+        raise HTTPException(status_code=400, detail="only .md files can be written")
     p.parent.mkdir(parents=True, exist_ok=True)
     tmp = p.with_suffix(p.suffix + ".tmp")
     tmp.write_text(body, encoding="utf-8")

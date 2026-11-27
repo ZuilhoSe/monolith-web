@@ -1,12 +1,12 @@
-/* Índice em memória (NÃO toca no vault): resolução de wikilinks, busca de
-   conteúdo full-text simples, quick-switcher fuzzy e backlinks on-the-fly. */
+/* In-memory index (NEVER touches the vault): wikilink resolution, simple
+   full-text content search, fuzzy quick-switcher and on-the-fly backlinks. */
 "use strict";
 
 const WIKILINK_RE = /!?\[\[([^\]]+?)\]\]/g;
 
 export function buildNoteIndex(tree) {
-  const byStem = new Map();   // nome-base minúsculo -> path
-  const byPath = new Map();   // path sem .md minúsculo -> path
+  const byStem = new Map();   // lowercase basename -> path
+  const byPath = new Map();   // lowercase path without .md -> path
   const flat = [];            // [{path, name}]
   (function walk(nodes) {
     for (const n of nodes) {
@@ -31,13 +31,13 @@ export function resolveNote(index, target) {
 export class Indexer {
   constructor(index) { this.index = index; this.docs = new Map(); this.ready = false; }
 
-  // Carrega o conteúdo de todas as notas e extrai links de saída (resolvidos).
+  // Loads every note's content and extracts its (resolved) outgoing links.
   async build(adapter, onProgress) {
     const files = this.index.flat;
     let done = 0;
     for (const f of files) {
       let text = "";
-      try { text = await adapter.readText(f.path); } catch { /* pula */ }
+      try { text = await adapter.readText(f.path); } catch { /* skip */ }
       const links = new Set();
       let m;
       WIKILINK_RE.lastIndex = 0;
@@ -52,7 +52,7 @@ export class Indexer {
     if (onProgress) onProgress(files.length, files.length);
   }
 
-  // Busca de conteúdo: todos os termos presentes (AND), ranqueada.
+  // Content search: all terms must match (AND), ranked.
   search(query, limit = 40) {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (!terms.length) return [];
@@ -65,14 +65,14 @@ export class Indexer {
         score += c;
       }
       if (!ok) continue;
-      if (d.name.toLowerCase().includes(terms[0])) score += 10; // casar no título pesa mais
+      if (d.name.toLowerCase().includes(terms[0])) score += 10; // title matches weigh more
       out.push({ path, name: d.name, score, snippet: snippet(d.lower, terms[0]) });
     }
     out.sort((a, b) => b.score - a.score);
     return out.slice(0, limit);
   }
 
-  // Quick-switcher: fuzzy por nome/caminho.
+  // Quick-switcher: fuzzy match on name/path.
   quickSwitch(query, limit = 20) {
     const q = query.toLowerCase().trim();
     const res = [];
@@ -105,7 +105,7 @@ function snippet(lower, term) {
   return (start ? "…" : "") + lower.slice(start, end).trim() + (end < lower.length ? "…" : "");
 }
 
-// Subsequence fuzzy: casa todos os chars de q em ordem; bônus por contiguidade/início.
+// Subsequence fuzzy: every char of q in order; bonus for contiguity / start of word.
 function fuzzyScore(q, name, path) {
   if (!q) return 0;
   const hay = name + " " + path;

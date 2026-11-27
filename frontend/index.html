@@ -1,54 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Obsidian Web</title>
-<link rel="stylesheet" href="/vendor/katex/katex.min.css">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="app" hidden>
-    <!-- Ribbon de ícones -->
+    <!-- Icon ribbon -->
     <nav id="ribbon">
-      <button class="rib" data-action="toggle-sidebar" title="Alternar painel lateral">
+      <button class="rib" data-action="toggle-sidebar" title="Toggle sidebar">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
       </button>
       <div class="rib-sep"></div>
-      <button class="rib active" data-pane="files" title="Arquivos">
+      <button class="rib active" data-pane="files" title="Files">
         <svg viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
       </button>
-      <button class="rib" data-pane="search" title="Buscar (Ctrl+Shift+F)">
+      <button class="rib" data-pane="search" title="Search (Ctrl+Shift+F)">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
-      <button class="rib" data-soon="Favoritos" title="Favoritos (em breve)">
+      <button class="rib" data-soon="Bookmarks" title="Bookmarks (coming soon)">
         <svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       </button>
-      <button class="rib" id="rib-graph" title="Grafo">
+      <button class="rib" id="rib-graph" title="Graph">
         <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
       </button>
-      <button class="rib" data-soon="Canvas" title="Canvas (em breve)">
+      <button class="rib" data-soon="Canvas" title="Canvas (coming soon)">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       </button>
-      <button class="rib" data-soon="Notas diárias" title="Notas diárias (em breve)">
+      <button class="rib" data-soon="Daily notes" title="Daily notes (coming soon)">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       </button>
-      <button class="rib" data-soon="Paleta de comandos" title="Paleta de comandos (em breve)">
+      <button class="rib" data-soon="Command palette" title="Command palette (coming soon)">
         <svg viewBox="0 0 24 24"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></svg>
       </button>
-      <button class="rib" data-soon="Outline" title="Outline (em breve)">
+      <button class="rib" data-soon="Outline" title="Outline (coming soon)">
         <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
       </button>
       <div class="rib-spacer"></div>
-      <button class="rib" data-soon="Ajuda" title="Ajuda (em breve)">
+      <button class="rib" data-soon="Help" title="Help (coming soon)">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
       </button>
-      <button class="rib" id="rib-about" title="Configurações / Sobre">
+      <button class="rib" id="rib-about" title="Settings / About">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </nav>
 
-    <!-- Painel lateral -->
+    <!-- Sidebar -->
     <aside id="sidebar">
       <div class="side-head">
         <span class="vault-name" id="vault-name">vault</span>
@@ -57,50 +57,50 @@
 
       <div class="pane" id="pane-files">
         <div class="file-toolbar">
-          <button class="ft" data-action="new-note" title="Nova nota">
+          <button class="ft" data-action="new-note" title="New note">
             <svg viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
           </button>
-          <button class="ft" data-soon="Nova pasta" title="Nova pasta (em breve)">
+          <button class="ft" data-soon="New folder" title="New folder (coming soon)">
             <svg viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6M9 13h6"/></svg>
           </button>
-          <button class="ft" data-soon="Ordenar" title="Ordenar (em breve)">
+          <button class="ft" data-soon="Sort" title="Sort (coming soon)">
             <svg viewBox="0 0 24 24"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/><path d="M11 12h4M11 16h7M11 20h10"/></svg>
           </button>
-          <button class="ft" data-action="collapse-all" title="Recolher tudo">
+          <button class="ft" data-action="collapse-all" title="Collapse all">
             <svg viewBox="0 0 24 24"><path d="m17 11-5-5-5 5"/><path d="m17 18-5-5-5 5"/></svg>
           </button>
         </div>
-        <input id="filter" class="inp" type="text" placeholder="Filtrar…  (Ctrl+O p/ abrir)" autocomplete="off">
+        <input id="filter" class="inp" type="text" placeholder="Filter…  (Ctrl+O to open)" autocomplete="off">
         <nav id="tree" class="tree"></nav>
       </div>
 
       <div class="pane" id="pane-search" hidden>
-        <input id="search-input" class="inp" type="text" placeholder="Buscar no conteúdo…" autocomplete="off">
+        <input id="search-input" class="inp" type="text" placeholder="Search content…" autocomplete="off">
         <div id="index-state" class="index-state"></div>
         <div id="search-results" class="results"></div>
       </div>
 
-      <!-- Seletor de vault (rodapé) -->
-      <button class="vault-switcher" id="vault-switcher" title="Trocar de vault">
+      <!-- Vault switcher (footer) -->
+      <button class="vault-switcher" id="vault-switcher" title="Switch vault">
         <span class="vs-icon">🪨</span>
         <span class="vs-name" id="vs-name">vault</span>
         <svg class="vs-chev" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
       </button>
     </aside>
 
-    <!-- Área principal -->
+    <!-- Main area -->
     <main id="main">
       <header id="tabbar">
         <div id="tabs" class="tabs-row"></div>
-        <button id="tab-new" class="tab-new" title="Nova aba">
+        <button id="tab-new" class="tab-new" title="New tab">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <div class="vh-actions">
-          <button id="btn-edit" class="icon-btn" title="Editar (Ctrl+E)" hidden>
+          <button id="btn-edit" class="icon-btn" title="Edit (Ctrl+E)" hidden>
             <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
           </button>
-          <button id="btn-save" class="btn primary sm" hidden>Salvar</button>
-          <button id="btn-cancel" class="btn sm" hidden>Cancelar</button>
+          <button id="btn-save" class="btn primary sm" hidden>Save</button>
+          <button id="btn-cancel" class="btn sm" hidden>Cancel</button>
           <span id="save-state" class="save-state"></span>
         </div>
       </header>
@@ -117,44 +117,46 @@
     </main>
   </div>
 
-  <!-- Modo local -->
+  <!-- Local mode landing -->
   <div id="landing" class="landing" hidden>
     <div class="landing-card">
       <div class="welcome-logo">🪨</div>
       <h1>Obsidian&nbsp;Web</h1>
-      <p>Cliente web não-invasivo pro seu vault. Nada sai do seu computador — os arquivos ficam locais.</p>
-      <button id="open-folder" class="btn primary big">Abrir pasta do vault</button>
-      <p class="unsupported" id="unsupported" hidden>Seu navegador não suporta abrir pastas locais (use Chrome/Edge).</p>
+      <p>A non-invasive web client for your vault. Nothing leaves your computer — your files stay local.</p>
+      <button id="open-folder" class="btn primary big">Open vault folder</button>
+      <p class="unsupported" id="unsupported" hidden>Your browser can't open local folders (use Chrome/Edge).</p>
+      <p class="landing-foot">Free &amp; open source (MIT) · <a href="https://github.com/ZuilhoSe/obsidian-web" target="_blank" rel="noopener">★ Star on GitHub</a></p>
     </div>
   </div>
 
-  <!-- Sobre / trocar vault -->
+  <!-- About / switch vault -->
   <div id="about" class="modal" hidden>
     <div class="modal-box about-box">
       <div class="welcome-logo">🪨</div>
-      <h2>Obsidian&nbsp;Web <span class="ver">v0.2</span></h2>
-      <p class="about-desc">Cliente web open-source e <b>não-invasivo</b> pro seu vault: lê e escreve os <code>.md</code> como estão, nunca grava índice ou metadados dentro do vault.</p>
-      <div class="about-row"><span>Modo</span><b id="about-mode">—</b></div>
+      <h2>Obsidian&nbsp;Web <span class="ver">v0.3</span></h2>
+      <p class="about-desc">Open-source, <b>non-invasive</b> web client for your vault: it reads and writes your <code>.md</code> files as-is, and never writes an index or metadata into the vault.</p>
+      <div class="about-row"><span>Mode</span><b id="about-mode">—</b></div>
       <div class="about-row"><span>Vault</span><b id="about-vault">—</b></div>
-      <button id="about-open" class="btn primary">📂 Abrir pasta local (trocar vault)</button>
+      <button id="about-open" class="btn primary">📂 Open local folder (switch vault)</button>
       <p id="about-note" class="about-note"></p>
-      <button id="about-close" class="btn sm about-close">Fechar</button>
+      <a class="about-repo" href="https://github.com/ZuilhoSe/obsidian-web" target="_blank" rel="noopener">★ Open source on GitHub</a>
+      <button id="about-close" class="btn sm about-close">Close</button>
     </div>
   </div>
 
   <!-- Quick switcher -->
   <div id="switcher" class="switcher" hidden>
     <div class="switcher-box">
-      <input id="switcher-input" type="text" placeholder="Abrir nota…" autocomplete="off">
+      <input id="switcher-input" type="text" placeholder="Open note…" autocomplete="off">
       <div id="switcher-results" class="results"></div>
     </div>
   </div>
 
   <div id="toast" class="toast" hidden></div>
 
-  <script src="/vendor/marked.min.js"></script>
-  <script src="/vendor/katex/katex.min.js"></script>
-  <script src="/vendor/mermaid.min.js"></script>
-  <script type="module" src="/js/app.js"></script>
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/mermaid.min.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

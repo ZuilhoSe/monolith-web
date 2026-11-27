@@ -1,0 +1,11 @@
+# Optional: also attach the container to an existing reverse-proxy network
+# (Traefik, Caddy, cloudflared...) so the proxy can reach it as obsidian-web:8000.
+# Enable with:  COMPOSE_FILE=compose.yml:compose.proxy.yml  and  PROXY_NETWORK=<name>
+services:
+  obsidian-web:
+    networks: [default, proxy]
+
+networks:
+  proxy:
+    external: true
+    name: "${PROXY_NETWORK:?set PROXY_NETWORK to your proxy's docker network}"

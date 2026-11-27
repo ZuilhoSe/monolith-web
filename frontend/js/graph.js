@@ -1,6 +1,6 @@
-/* Graph view: grafo força-dirigido das notas (nós) e wikilinks (arestas),
-   em canvas. Pan (arrastar), zoom (roda), clique no nó abre a nota.
-   Sem dependências. */
+/* Graph view: force-directed graph of notes (nodes) and wikilinks (edges)
+   on a canvas. Pan (drag), zoom (wheel), click a node to open the note.
+   No dependencies. */
 "use strict";
 
 export function renderGraph(container, nodes, edges, onOpen) {
@@ -28,14 +28,14 @@ export function renderGraph(container, nodes, edges, onOpen) {
 
   // view transform
   let scale = 1, ox = W / 2, oy = H / 2;
-  // começa centralizado nos nós (que nascem perto de 0,0)
+  // starts centred on the nodes (which spawn near 0,0)
   let hover = -1, dragging = false, dragModel = null, lastX = 0, lastY = 0, moved = 0;
 
   function sim() {
     const K = 0.015, REP = 1600, SPRING = 0.02, LEN = 60, DAMP = 0.86;
     for (let i = 0; i < nodes.length; i++) {
       const a = nodes[i];
-      a.vx += -a.x * K; a.vy += -a.y * K;         // centraliza
+      a.vx += -a.x * K; a.vy += -a.y * K;         // centring force
       for (let j = i + 1; j < nodes.length; j++) {
         const b = nodes[j];
         let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy || 0.01;
@@ -44,7 +44,7 @@ export function renderGraph(container, nodes, edges, onOpen) {
         a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
       }
     }
-    for (const [i, j] of edges) {               // molas nas arestas
+    for (const [i, j] of edges) {               // springs along edges
       const a = nodes[i], b = nodes[j];
       let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
       const f = (d - LEN) * SPRING, fx = (dx / d) * f, fy = (dy / d) * f;
@@ -61,18 +61,18 @@ export function renderGraph(container, nodes, edges, onOpen) {
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, W, H);
     ctx.translate(ox, oy); ctx.scale(scale, scale);
-    // arestas
+    // edges
     ctx.strokeStyle = COL_EDGE; ctx.lineWidth = 1 / scale;
     ctx.beginPath();
     for (const [i, j] of edges) { ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); }
     ctx.stroke();
-    // nós
+    // nodes
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i], r = 3 + Math.min(n.deg, 8) * 1.1;
       ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 6.2832);
       ctx.fillStyle = i === hover ? COL_HI : COL_NODE; ctx.fill();
     }
-    // rótulos (quando com zoom suficiente, ou no hover)
+    // labels (when zoomed in enough, or on hover)
     ctx.fillStyle = COL_TXT; ctx.font = (11 / scale) + "px sans-serif"; ctx.textAlign = "center";
     if (scale > 0.7 || hover >= 0) {
       for (let i = 0; i < nodes.length; i++) {
@@ -86,12 +86,12 @@ export function renderGraph(container, nodes, edges, onOpen) {
 
   let raf;
   function loop() {
-    if (!canvas.isConnected) { ro.disconnect(); return; } // para ao sair da view
+    if (!canvas.isConnected) { ro.disconnect(); return; } // stop once the view is gone
     sim(); draw(); raf = requestAnimationFrame(loop);
   }
   loop();
 
-  // interação
+  // interaction
   function toModel(ev) {
     const r = canvas.getBoundingClientRect();
     return { x: (ev.clientX - r.left - ox) / scale, y: (ev.clientY - r.top - oy) / scale, sx: ev.clientX - r.left, sy: ev.clientY - r.top };
