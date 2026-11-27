@@ -19,7 +19,7 @@ $$
 ## Diagrams (Mermaid)
 ```mermaid
 graph LR
-  A[Your .md files] --> B(Obsidian Web)
+  A[Your .md files] --> B(Monolith)
   B --> C{Local folder}
   B --> D{Self-hosted server}
 ```
@@ -27,7 +27,7 @@ graph LR
 ## Code
 ```python
 def non_invasive(vault):
-    return "no .obsidian-web folder, no index, no lock files"
+    return "no hidden folder, no index, no lock files"
 ```
 
 ## Links and embeds

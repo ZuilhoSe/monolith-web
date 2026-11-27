@@ -1,4 +1,4 @@
-# Contributing to Obsidian Web
+# Contributing to Monolith
 
 Thanks for helping! This project is small on purpose and easy to get into.
 

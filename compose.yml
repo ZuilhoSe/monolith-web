@@ -1,12 +1,12 @@
-# Obsidian Web — minimal self-hosted setup.
+# Monolith — minimal self-hosted setup.
 #   VAULT_PATH=/path/to/your/vault docker compose up -d --build
 # Then open http://localhost:8099
 # Put it behind a reverse proxy that handles auth (Authelia, Cloudflare Access,
 # Tailscale, basic auth...) before exposing it to the internet.
 services:
-  obsidian-web:
+  monolith:
     build: .
-    container_name: obsidian-web
+    container_name: monolith
     restart: unless-stopped
     environment:
       VAULT_DIR: /vault

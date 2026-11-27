@@ -243,3 +243,4 @@ kbd{background:var(--bg-mod); border:1px solid var(--line); border-radius:4px; p
 .landing-foot{margin-top:22px; font-size:12.5px; color:var(--faint)}
 .landing-foot a{color:var(--acc); text-decoration:none; font-weight:600}
 .landing-foot a:hover{text-decoration:underline}
+.landing-card .tagline{margin:-6px 0 14px; font-size:15px; font-weight:600; color:var(--acc)}

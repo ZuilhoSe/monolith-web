@@ -1,4 +1,4 @@
-/* Obsidian Web — app (glue). Dual-mode, rich rendering, search, quick-switcher,
+/* Monolith — app (glue). Dual-mode, rich rendering, search, quick-switcher,
    backlinks and an Obsidian-style UI. */
 "use strict";
 import { ServerAdapter, LocalAdapter } from "./vault.js";

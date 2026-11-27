@@ -1,18 +1,18 @@
 <div align="center">
 
-# 🪨 Obsidian Web
+# 🪨 Monolith
 
-**A free, open-source web client for your Obsidian vault.**
+**A free, open-source webview for Obsidian.**
 Open your notes in any browser — from a local folder or your own server — without changing a single file.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-7c5cff.svg)](LICENSE)
-[![Live demo](https://img.shields.io/badge/demo-try_it_now-7c5cff.svg)](https://zuilhose.github.io/obsidian-web/)
+[![Live demo](https://img.shields.io/badge/demo-try_it_now-7c5cff.svg)](https://zuilhose.github.io/monolith-web/)
 [![No build step](https://img.shields.io/badge/build_step-none-555555.svg)](#architecture)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-### [▶ Try it now — no install, no upload](https://zuilhose.github.io/obsidian-web/)
+### [▶ Try it now — no install, no upload](https://zuilhose.github.io/monolith-web/)
 
-![Obsidian Web showing a note with callouts and math](docs/screenshot-note.png)
+![Monolith showing a note with callouts and math](docs/screenshot-note.png)
 
 </div>
 
@@ -23,7 +23,7 @@ on a work laptop where you can't install anything, on a borrowed computer, or se
 homelab to every device you own. Existing options either require a paid plan or a running copy
 of the desktop app, or they quietly fill your vault with their own index and config files.
 
-Obsidian Web is built around three rules:
+Monolith is built around three rules:
 
 1. **Non-invasive.** It reads and writes your `.md` files *exactly as they are*. It never creates
    an index, cache, lock file or hidden folder inside your vault. Delete it tomorrow and your vault
@@ -33,7 +33,7 @@ Obsidian Web is built around three rules:
 3. **Open source, forever.** MIT-licensed, no build step, plain JavaScript — easy to read, fork
    and hack on.
 
-> Obsidian Web is an independent community project. It is not affiliated with or endorsed by
+> Monolith is an independent community project. It is not affiliated with or endorsed by
 > Obsidian / Dynalist Inc. If you use Obsidian, consider supporting them.
 
 ## Two ways to use it
@@ -41,7 +41,7 @@ Obsidian Web is built around three rules:
 | | **Local mode** | **Server mode** |
 |---|---|---|
 | What it is | Static page that opens a folder from your disk ([File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API)) | Small Docker container serving your vault over HTTP |
-| Install | Nothing — use the [live demo](https://zuilhose.github.io/obsidian-web/) | `docker compose up -d` |
+| Install | Nothing — use the [live demo](https://zuilhose.github.io/monolith-web/) | `docker compose up -d` |
 | Where files live | Your computer, never uploaded | Your server |
 | Browsers | Chrome, Edge, Brave, Opera (desktop) | Any modern browser, incl. mobile |
 | Good for | Quick access on any desktop | Homelab, phone/tablet access, sharing read-only |
@@ -67,19 +67,19 @@ Obsidian Web is built around three rules:
 ## Quick start
 
 ### Local mode (zero install)
-Open **<https://zuilhose.github.io/obsidian-web/>**, click **Open vault folder**, and pick your vault.
+Open **<https://zuilhose.github.io/monolith-web/>**, click **Open vault folder**, and pick your vault.
 That's it. Everything runs in your browser.
 
 Want to run it offline? Any static file server works:
 ```bash
-git clone https://github.com/ZuilhoSe/obsidian-web
-cd obsidian-web/frontend && python3 -m http.server 8000
+git clone https://github.com/ZuilhoSe/monolith-web
+cd monolith-web/frontend && python3 -m http.server 8000
 ```
 
 ### Server mode (Docker)
 ```bash
-git clone https://github.com/ZuilhoSe/obsidian-web
-cd obsidian-web
+git clone https://github.com/ZuilhoSe/monolith-web
+cd monolith-web
 VAULT_PATH=/path/to/your/vault docker compose up -d --build
 # → http://localhost:8099
 ```
@@ -99,11 +99,11 @@ Without `VAULT_PATH` it starts with the bundled demo vault (`examples/demo-vault
 ```bash
 echo "COMPOSE_FILE=compose.yml:compose.proxy.yml" >> .env
 echo "PROXY_NETWORK=your_proxy_network" >> .env
-docker compose up -d --build   # proxy reaches it at http://obsidian-web:8000
+docker compose up -d --build   # proxy reaches it at http://monolith:8000
 ```
 
 ### Syncing
-Obsidian Web doesn't sync — it works with files wherever they are. Pair server mode with
+Monolith doesn't sync — it works with files wherever they are. Pair server mode with
 [Syncthing](https://syncthing.net/), Obsidian Sync, git, or any tool you already use to keep the
 server's copy and your devices in step.
 
@@ -146,7 +146,7 @@ Contributions of every size are welcome — bug reports with a Markdown snippet 
 differently from Obsidian are just as valuable as code. See [CONTRIBUTING.md](CONTRIBUTING.md).
 Issues labeled **good first issue** are a great place to start.
 
-If Obsidian Web is useful to you, **a ⭐ on GitHub** helps other people find it.
+If Monolith is useful to you, **a ⭐ on GitHub** helps other people find it.
 
 ## License
 

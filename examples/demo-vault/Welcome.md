@@ -1,7 +1,7 @@
-# Welcome to Obsidian Web 👋
+# Welcome to Monolith 👋
 
 This is a **demo vault**. Everything here is plain Markdown: open these files in
-Obsidian and they look the same. Obsidian Web reads and writes them as they are.
+Obsidian and they look the same. Monolith reads and writes them as they are.
 
 - Jump to [[Features tour]] to see what renders
 - Or open the [[Knowledge graph]] note, then click the graph icon in the left ribbon

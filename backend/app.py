@@ -1,5 +1,5 @@
 """
-Obsidian Web — backend (server mode).
+Monolith — backend (server mode).
 
 A self-hosted, open-source and NON-INVASIVE web client for an Obsidian vault:
 it reads/writes your .md files as-is, never writes an index or metadata into
@@ -24,7 +24,7 @@ READ_ONLY = os.environ.get("READ_ONLY", "false").lower() in ("1", "true", "yes")
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 HIDDEN_PREFIXES = (".",)
 
-app = FastAPI(title="Obsidian Web", version="0.3.0")
+app = FastAPI(title="Monolith", version="0.3.0")
 
 
 @app.middleware("http")
